@@ -12,17 +12,27 @@
   margin-left: 2em;
 }
 
-.PollPage .copy-poll-link-button {
-  margin-left: 35%;
-}
-
 .PollPage .center {
   display: flex;
   justify-content: center;
 }
 
+.PollPage .copy-poll-link-button {
+  border-radius: 25px;
+  height: 38px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 350;
+}
+
 .PollPage .vote-ratio-bar {
   padding: 5px 0 5px 1em;
+}
+
+.PollPage .voteButton {
+  padding: 0.5em;
+  width: 25%;
+  font-size: 18px;
 }
 
 .PollPage .text-center {
@@ -32,4 +42,11 @@
 .PollPage .loading-text {
   font-size: 2em;
   padding-top: 0.25em;
+}
+
+.PollPage .topButtons {
+  display: flex;
+  margin: 0 auto;
+  width: 70%;
+  justify-content: space-between;
 }

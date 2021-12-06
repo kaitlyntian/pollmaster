@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { ListGroup, Button, Row, Col, ProgressBar } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCopy } from "@fortawesome/free-regular-svg-icons";
+import { faCopy, faTrashAlt } from "@fortawesome/free-regular-svg-icons";
 import { useParams, useNavigate } from "react-router-dom";
 import ToastMessage from "../components/toastMessage";
 import BackButton from "../components/backButton";
 import Loader from "../components/loader";
+import SharePollSelections from "../components/polls/sharePoll";
 import "../stylesheets/polls/pollPage.css";
 
 const hasExpired = (unixTime) => {
@@ -111,6 +112,17 @@ const PollPage = () => {
     }
   };
 
+  // Problem: Post deleted but keep render in the backend
+  const deletePost = async () => {
+    if (user && poll && poll.owner === user._id) {
+      let res = await fetch(`/api/polls/${pollId}/delete?&userId=${user ? user._id : null}`);
+      if (res.ok) {
+        handleRedirect();
+        navigate("/polls");
+      }
+    }
+  };
+
   const renderPollOptions = () => {
     let totalVotes = poll.options.reduce((acc, curr) => acc + curr.votes, 0);
     let votesRatio = poll.options.map((el) => {
@@ -155,10 +167,14 @@ const PollPage = () => {
     if (expired) {
       return <div style={{ fontSize: "1.5em" }}>This poll has already ended</div>;
     } else if (votedIdx !== -1) {
-      return <Button disabled>You have voted</Button>;
+      return (
+        <Button className="voteButton" disabled>
+          You have voted
+        </Button>
+      );
     } else {
       return (
-        <Button disabled={votedIdx !== -1} onClick={handleVote}>
+        <Button className="voteButton" disabled={votedIdx !== -1} onClick={handleVote}>
           Submit Vote
         </Button>
       );
@@ -179,11 +195,10 @@ const PollPage = () => {
                 {renderVoteButton()}
               </div>
             </div>
-            <div className="center mt-5">
-              <div>
-                <div className="text-center">Share this poll:</div>
 
-                <div>{window.location.href}</div>
+            <div className="mt-5">
+              <div className="text-center mb-2">Share this poll:</div>
+              <div className="center sharePollChoices">
                 <Button
                   aria-label="copy poll link"
                   className="copy-poll-link-button p-2 btn"
@@ -192,8 +207,9 @@ const PollPage = () => {
                     setSuccess("Poll link copied");
                   }}
                 >
-                  <FontAwesomeIcon icon={faCopy} /> Copy Link
+                  <FontAwesomeIcon icon={faCopy} /> Copy URL Link
                 </Button>
+                <SharePollSelections title={poll.title} url={window.location.href} />
               </div>
             </div>
           </>
@@ -210,8 +226,13 @@ const PollPage = () => {
   return (
     <div className="PollPage">
       {/* <div className="back-button"> */}
-      <div style={{ width: "70%", margin: "0 auto" }}>
+      <div className="topButtons">
         <BackButton onRedirect={handleRedirect} to="/polls" />
+        {user && poll && poll.owner === user._id ? (
+          <Button onClick={deletePost}>
+            <FontAwesomeIcon icon={faTrashAlt} /> Delete Poll
+          </Button>
+        ) : null}
       </div>
       {/* </div> */}
       {renderPoll()}

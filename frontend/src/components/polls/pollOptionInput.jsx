@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Form, Button } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMinus } from "@fortawesome/free-solid-svg-icons";
+import { faTimes } from "@fortawesome/free-solid-svg-icons";
 import "../../stylesheets/polls/pollOptionInput.css";
 import PropTypes from "prop-types";
 
@@ -27,7 +27,7 @@ const PollOptionInput = ({ defaultValue, onOptionValueChange, deletable, index, 
           className="delete-poll-option-button"
           variant="danger"
         >
-          <FontAwesomeIcon icon={faMinus} />
+          <FontAwesomeIcon icon={faTimes} /> <span className="ms-1">Remove</span>
         </Button>
       ) : (
         <div className="button-placeholder"></div>
@@ -42,7 +42,6 @@ const PollOptionInput = ({ defaultValue, onOptionValueChange, deletable, index, 
             onChange={onValueChange}
             name="options"
             placeholder="Type in your option prompt here"
-
           />
           <Form.Control.Feedback type="invalid">The option prompt cannot be empty</Form.Control.Feedback>
         </Form.Group>
