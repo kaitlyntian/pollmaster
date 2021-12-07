@@ -25,6 +25,7 @@ const throttle = (callback, delay) => {
 const CreatePollPage = ({ hasUser }) => {
   let [options, setOptions] = useState([""]);
   let [message, setMessage] = useState(null);
+  let [error, setError] = useState(null);
   let [validated, setValidated] = useState(false);
   let [publicityMsg, setPublicityMsg] = useState(PUBLICMSG);
   let [isDisable, setDisableButton] = useState(false);
@@ -45,11 +46,11 @@ const CreatePollPage = ({ hasUser }) => {
     }
   }, [hasUser]);
 
-  useEffect(() => {
-    if (focus !== -1 && focus < options.length) {
-      document.querySelector(`#pollOption-${focus}`).focus();
-    }
-  }, [focus]);
+  // useEffect(() => {
+  //   if (focus !== -1 && focus < options.length) {
+  //     document.querySelector(`#pollOption-${focus}`).focus();
+  //   }
+  // }, [focus]);
 
   const handleOptionValueChange = (idx, value) => {
     let newOptions = options.map((el, i) => {
@@ -73,6 +74,7 @@ const CreatePollPage = ({ hasUser }) => {
           defaultValue={el}
           onOptionValueChange={handleOptionValueChange}
           deletable={options.length > 1}
+          focus={idx === focus}
           index={idx}
           onDeletePollOption={handleDeletePollOption}
         />
@@ -117,9 +119,16 @@ const CreatePollPage = ({ hasUser }) => {
     if (res.ok) {
       let json = await res.json();
       setMessage(json.message);
-      setDisableButton(false);
       navigate(`/polls/${json.newPollId}`);
+    } else {
+      try {
+        let json = await res.json();
+        setError(json.message);
+      } catch (e) {
+        setError("Unable to connect to server, please try again later");
+      }
     }
+    setDisableButton(false);
   };
 
   return (
@@ -137,7 +146,7 @@ const CreatePollPage = ({ hasUser }) => {
 
           <div className="poll-options mt-5 mb-1">{renderPollOptions()}</div>
 
-          <Form.Group className="mb-3" style={{ marginLeft: "6.8em" }} controlId="placeholderInput">
+          <Form.Group className="mb-3" style={{ marginLeft: "3.25em" }} controlId="placeholderInput">
             <Form.Label>Add option</Form.Label>
             <Form.Control
               type="text"
@@ -177,17 +186,19 @@ const CreatePollPage = ({ hasUser }) => {
               <option value={true}>Public</option>
               <option value={false}>Private</option>
             </Form.Select>
-            <Form.Text style={{ color: "black" }}>{publicityMsg}</Form.Text>
+            <Form.Text>{publicityMsg}</Form.Text>
           </Form.Group>
         </div>
 
-        <div className="ps-4 mb-4 submit-button-div">
+        <div className="ps-4 submit-button-div">
           <Button type="submit" disabled={isDisable}>
             Submit
           </Button>
         </div>
+        <div className="text-center mt-2 mb-2">Note: The expiration date is defaulted to 30 days in the future</div>
       </Form>
       {message ? <ToastMessage show={true} message={message} setMessage={setMessage} type="Success" /> : null}
+      {error ? <ToastMessage show={true} message={error} setMessage={setError} type="Error" /> : null}
     </div>
   );
 };

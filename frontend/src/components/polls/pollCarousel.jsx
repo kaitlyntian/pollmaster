@@ -11,24 +11,29 @@ import PropTypes from "prop-types";
 import { Carousel, Container } from "react-bootstrap";
 
 const PollCarousel = ({ polls }) => {
-  const [index, setIndex] = useState(0);
+  const pageSize = 5;
   let [hoverIdx, setHoverIdx] = useState(-1);
+  let [page, setPage] = useState(0);
 
   const handleSelect = (selectedIndex) => {
-    setIndex(selectedIndex);
+    setPage(selectedIndex);
   };
 
   const handleHover = (idx) => {
     setHoverIdx(idx);
   };
 
-  const renderPollList = () => {
-    return polls.map((el, idx) => {
+  const renderCarousel = () => {
+    let items = [];
+    for (let i = 0; i < Math.ceil(polls.length / pageSize); i++) {
+      items.push(i);
+    }
+    return items.map((item) => {
       return (
-        <Carousel.Item key={idx}>
-          <PollListItem key={idx} poll={el} idx={idx} onHover={handleHover} hover={hoverIdx === idx} />
-          <PollListItem key={idx} poll={el} idx={idx + 1} onHover={handleHover} hover={hoverIdx === idx} />
-          <PollListItem key={idx} poll={el} idx={idx + 2} onHover={handleHover} hover={hoverIdx === idx} />
+        <Carousel.Item key={item}>
+          {polls.slice(pageSize * page, pageSize * (page + 1)).map((el, idx) => {
+            return <PollListItem key={idx} poll={el} idx={idx} onHover={handleHover} hover={hoverIdx === idx} />;
+          })}
         </Carousel.Item>
       );
     });
@@ -36,7 +41,9 @@ const PollCarousel = ({ polls }) => {
 
   return (
     <Container>
-      <Carousel>{renderPollList()}</Carousel>
+      <Carousel indicators={false} pause="hover">
+        {renderCarousel()}
+      </Carousel>
     </Container>
   );
 };
@@ -46,6 +53,12 @@ PollCarousel.propTypes = {
     PropTypes.shape({
       _id: PropTypes.string,
       title: PropTypes.string,
+      options: PropTypes.arrayOf(
+        PropTypes.shape({
+          prompt: PropTypes.string,
+          votes: PropTypes.number,
+        })
+      ),
       owner: PropTypes.string,
       totalVotes: PropTypes.number,
       public: PropTypes.bool,
