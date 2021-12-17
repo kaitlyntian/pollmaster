@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import ToastMessage from "../components/toastMessage";
 
+## the style would be better to put in the css sheet since you guys alreayd created a lot of files of them
 const UserRegistrationPage = ({ setLogin }) => {
   const styles = {
     form: {
